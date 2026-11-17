@@ -1,17 +1,31 @@
-# car_game_pro
+# Super Car Racer
 
-A new Flutter project.
+A cross-platform Flutter arcade game. Dodge traffic by changing lanes, build
+your score, and beat your saved high score.
 
-## Getting Started
+## Run the game
 
-This project is a starting point for a Flutter application.
+From the project directory:
 
-A few resources to get you started if this is your first Flutter project:
+```shell
+flutter pub get
+flutter run
+```
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+For a specific device, list available targets with `flutter devices`, then run
+`flutter run -d <device-id>`. Flutter supports the configured Android, iOS,
+Windows, macOS, Linux, and web targets.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Controls
+
+- **Keyboard:** Left/Right arrows or **A / D**
+- **Touch:** Use the on-screen left and right buttons
+
+The best score is saved on the current device.
+
+## Checks
+
+```shell
+flutter analyze
+flutter test
+```

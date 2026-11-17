@@ -1,30 +1,68 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:car_game_pro/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUp(() {
+    SharedPreferences.setMockInitialValues(<String, Object>{'high_score': 12});
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('starts a game and moves between lanes with touch controls', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const CarGameApp());
+    expect(find.text('SUPER CAR RACER'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    await tester.tap(find.byKey(const ValueKey('start-game')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(find.text('SCORE'), findsOneWidget);
+    expect(find.text('BEST'), findsOneWidget);
+    expect(find.byKey(const ValueKey('player-lane-1')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('move-left')));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('player-lane-0')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('move-left')));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('player-lane-0')), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey('move-right')));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('player-lane-1')), findsOneWidget);
+  });
+
+  testWidgets('keyboard controls move the player', (tester) async {
+    await tester.pumpWidget(const CarGameApp());
+    await tester.tap(find.byKey(const ValueKey('start-game')));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    expect(find.byKey(const ValueKey('player-lane-2')), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+    await tester.pump();
+    expect(find.byKey(const ValueKey('player-lane-1')), findsOneWidget);
+  });
+
+  testWidgets('game layout fits a small mobile screen', (tester) async {
+    tester.view.physicalSize = const Size(360, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const CarGameApp());
+    await tester.tap(find.byKey(const ValueKey('start-game')));
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byKey(const ValueKey('move-left')), findsOneWidget);
+    expect(find.byKey(const ValueKey('move-right')), findsOneWidget);
   });
 }
